@@ -23,19 +23,21 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
-// Start the server
-const server = app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
-});
-
-// Clean shutdown handlers
-const shutdown = () => {
-  console.log('[server]: Shutdown signal received. Closing HTTP server...');
-  server.close(() => {
-    console.log('[server]: HTTP server closed. Process terminating...');
-    process.exit(0);
+if (!process.env.VERCEL) {
+  const server = app.listen(port, () => {
+    console.log(`[server]: Server is running at http://localhost:${port}`);
   });
-};
 
-process.on('SIGINT', shutdown);
-process.on('SIGTERM', shutdown);
+  const shutdown = () => {
+    console.log('[server]: Shutdown signal received. Closing HTTP server...');
+    server.close(() => {
+      console.log('[server]: HTTP server closed. Process terminating...');
+      process.exit(0);
+    });
+  };
+
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
+}
+
+export default app;
